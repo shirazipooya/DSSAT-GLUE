@@ -160,6 +160,11 @@ eval(parse(text=paste("source('",WD,"/BatchFileSetUp.r')",sep = '')));
 BatchFileSetUp(WD, OD, CultivarBatchFile);
 write(c("DSSAT batch file =",CultivarBatchFile), file = ModelRunIndicatorPath, ncolumns=2, append = T);
 
+## (7) Read DSSATPRO file to select model for crops having multiple models in DSSAT.
+DSSATPRO <- read.csv(paste0(DSSATD,"/DSSATPRO.v47" ), sep = " ")
+ModelName <- paste0("M",CropName)
+ModelSelect <- as.character(DSSATPRO[which(DSSATPRO[,1]==ModelName),"PROFILE"])
+
 #################Step 2: Begin the GLUE procedure.#################
 for (i in StartRoundOfGLUE:TotalRoundOfGLUE)
 {
@@ -207,7 +212,7 @@ write("Model runs are starting...", file = ModelRunIndicatorPath, append = T);
 
 ## (3) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
 eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
-ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix);
+ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, ModelSelect);
 write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
 
 write("Likelihood calculation is starting...", file = ModelRunIndicatorPath, append = T);
